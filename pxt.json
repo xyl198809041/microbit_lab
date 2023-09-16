@@ -1,5 +1,6 @@
 {
     "name": "lab-库文件",
+    "version": "2.0.0",
     "description": "",
     "dependencies": {
         "core": "*",
@@ -22,7 +23,7 @@
     "supportedTargets": [
         "microbit"
     ],
-    "preferredEditor": "blocksprj",
+    "preferredEditor": "tsprj",
     "yotta": {
         "config": {
             "microbit-dal": {
