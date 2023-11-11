@@ -84,10 +84,6 @@ namespace 方位测量 {
 }
 
 
-
-
-
-
 //% color="#2c3e50" weight=10 icon=""
 namespace 显示{
     /**
@@ -108,3 +104,32 @@ namespace 显示{
         rt_s.showImage(0)
     }
 }
+
+//% color="#2c3e50" weight=10 icon=""
+namespace 算法{
+    /**
+     * @param controlVariable 传感器测量值 
+     * @param setpoint 标准值 
+     * @param Kp 比例系数 eg: 1 
+     * @param Ki 积分系数 eg: 1 
+     * @param Kd 微分系数 eg: 1 
+     */
+    //% block="PID算法|传感器测量值 %controlVariable 标准值 %setpoint 比例系数 %Kp 积分系数 %Ki 微分系数 %Kd"
+    export function calculatePID(controlVariable: number, setpoint:number,Kp:number=1, Ki:number=1, Kd:number=1):number {
+        let previousError = 0;
+        let integral = 0;
+
+        const error = setpoint - controlVariable;
+        const proportional = Kp * error;
+
+        integral += error;
+        const integralValue = Ki * integral;
+
+        const derivative = Kd * (error - previousError);
+        previousError = error;
+
+        const output = proportional + integralValue + derivative;
+        return output;
+    }
+}
+

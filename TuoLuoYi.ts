@@ -7,7 +7,7 @@ load dependency
 /*
  * MPU6050 block
  */
-//% weight=20 color=#9900CC icon="\uf13d" block="陀螺仪"
+//% weight=0 color=#9900CC icon="\uf13d" block="陀螺仪"
 namespace MPU6050 {
 
 

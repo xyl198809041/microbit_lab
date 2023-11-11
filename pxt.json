@@ -12,13 +12,14 @@
         "main.ts",
         "README.md",
         "tool.ts",
-        "TuoLuoYi.ts"
+        "TuoLuoYi.ts",
+        "main.py"
     ],
     "testFiles": [
         "test.ts"
     ],
     "targetVersions": {
-        "target": "6.0.19",
+        "target": "6.0.22",
         "targetId": "microbit"
     },
     "supportedTargets": [
