@@ -107,6 +107,54 @@ namespace 显示{
 
 //% color="#2c3e50" weight=10 icon=""
 namespace 算法{
+
+    // let PID_data: { Kp: number, Ki: number, Kd: number, previousError: number, integral:number}={
+    //     Kd:1,
+    //     Ki:1,
+    //     Kp:1,
+        
+    // }
+    export class PID{
+        public Kd:number
+        public Ki:number
+        public Kp:number
+        public previousError:number
+        public integral:number
+    }
+    /**
+     * @param controlVariable 传感器测量值
+     * @param setpoint 标准值
+     * @param Kp 比例系数 eg: 1
+     * @param Ki 积分系数 eg: 1
+     * @param Kd 微分系数 eg: 1
+     */
+    //% block="PID计算|PID数据 %PID_Data 传感器测量值 %controlVariable 标准值 %setpoint"
+    export function do_PID(PID_Data: PID, controlVariable: number, setpoint: number):number{
+        let error = setpoint - controlVariable;
+        let proportional = PID_Data.Kp * error;
+
+        PID_Data.integral += error;
+        let integralValue = PID_Data.Ki * PID_Data.integral;
+
+        let derivative = PID_Data.Kd * (error - PID_Data.previousError);
+        PID_Data.previousError = error;
+
+        let output = proportional + integralValue + derivative;
+        return output;
+    }
+    /**
+     * @param Kp 比例系数 eg: 1
+     * @param Ki 积分系数 eg: 1
+     * @param Kd 微分系数 eg: 1
+     */
+    //% block="创建PID数据|比例系数 %Kp 积分系数 %Ki 微分系数 %Kd"
+    export function new_PID(Kp: number, Ki: number, Kd: number):PID{
+        let pid_data =new PID()
+        pid_data.Kp=Kp
+        pid_data.Ki=Ki
+        pid_data.Kd=Kd
+        return pid_data
+    }
     /**
      * @param controlVariable 传感器测量值 
      * @param setpoint 标准值 
@@ -118,7 +166,6 @@ namespace 算法{
     export function calculatePID(controlVariable: number, setpoint:number,Kp:number=1, Ki:number=1, Kd:number=1):number {
         let previousError = 0;
         let integral = 0;
-
         const error = setpoint - controlVariable;
         const proportional = Kp * error;
 
