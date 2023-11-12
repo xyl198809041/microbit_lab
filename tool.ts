@@ -119,7 +119,22 @@ namespace 算法{
         public Ki:number
         public Kp:number
         public previousError:number
-        public integral:number
+        public integral:number[]
+        public add_integral(x:number){
+            this.integral.push(x)
+            if (this.integral.length>10){
+                this.integral.shift()
+            }
+        }
+        public sum_integral(){
+            let sum = 0;
+
+            for (let i = 0; i < this.integral.length; i++) {
+                sum += this.integral[i];
+            }
+        
+            return sum
+        }
     }
     /**
      * @param controlVariable 传感器测量值
@@ -133,8 +148,8 @@ namespace 算法{
         let error = setpoint - controlVariable;
         let proportional = PID_Data.Kp * error;
 
-        PID_Data.integral += error;
-        let integralValue = PID_Data.Ki * PID_Data.integral;
+        PID_Data.add_integral(error);
+        let integralValue = PID_Data.Ki * PID_Data.sum_integral();
 
         let derivative = PID_Data.Kd * (error - PID_Data.previousError);
         PID_Data.previousError = error;
@@ -154,7 +169,7 @@ namespace 算法{
         pid_data.Ki=Ki
         pid_data.Kd=Kd
         pid_data.previousError=0
-        pid_data.integral=0
+        pid_data.integral=[]
         return pid_data
     }
     /**
