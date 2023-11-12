@@ -153,6 +153,8 @@ namespace 算法{
         pid_data.Kp=Kp
         pid_data.Ki=Ki
         pid_data.Kd=Kd
+        pid_data.previousError=0
+        pid_data.integral=0
         return pid_data
     }
     /**
