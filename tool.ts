@@ -133,7 +133,7 @@ namespace 算法{
                 sum += this.integral[i];
             }
         
-            return sum
+            return sum/this.integral.length
         }
     }
     /**
