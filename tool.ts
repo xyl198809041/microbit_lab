@@ -197,3 +197,65 @@ namespace 算法{
     }
 }
 
+namespace spike{
+
+
+
+    /**
+ * @param txt 传感器测量值 
+ */
+    //% block="CRC32算法|字符串 %txt"
+    export function CRC32(txt: string): string {
+        function crc32(str: string) {
+            function decimalToHex(num: number): string {
+
+                const hexChars = '0123456789ABCDEF';
+                let hexString = '';
+
+                while (num > 0) {
+                    const remainder = num % 16;
+                    hexString = hexChars[remainder] + hexString;
+                    num = Math.floor(num / 16);
+                }
+
+                return hexString || '0';
+            }
+            let crcTable = (function () {
+                let c = 0
+                let table = [];
+
+
+                for (let n = 0; n != 256; ++n) {
+                    c = n;
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                    table[n] = c;
+                }
+
+                return table;
+            })();
+
+            let crc = 0 ^ (-1);
+
+            for (let i = 0; i < str.length; ++i) {
+                crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+            }
+
+            return decimalToHex((crc ^ (-1)) >>> 0);
+        };
+        function reversePairs(str:string):string {
+            let reversed = '';
+            for (let i = str.length - 2; i >= 0; i -= 2) {
+                reversed += str.substr(i, 2);
+            }
+            return reversed;
+        }
+        return reversePairs(crc32(txt))
+    }
+}
