@@ -198,28 +198,111 @@ namespace 算法{
 }
 
 namespace spike{
+    let _msg_data=''
+    let _need_clear=false
+    let _num=16
+
+    function get_data_num():string{
+        if(_num==255){
+            _num=16
+        }
+        _num=_num+1
+        return decimalToHex(_num);
+    }
 
 
+    function decimalToHex(num: number): string {
+
+        const hexChars = '0123456789ABCDEF';
+        let hexString = '';
+
+        while (num > 0) {
+            const remainder = num % 16;
+            hexString = hexChars[remainder] + hexString;
+            num = Math.floor(num / 16);
+        }
+
+        return hexString || '0';
+    }
+    /**
+         * @param str 传感器测量值
+         */
+    //% block="发送消息|消息编号 %id|字符串 %msg"
+    export function 发送消息(id:string,msg: string) {
+        let data_head ='FF9703'
+        let data_num= get_data_num()
+        let data_id=CRC32(id)
+        let data_msg=msg.split('').map(char => decimalToHex(char.charCodeAt(0))).join('');
+        let data=data_head+data_num+data_id+data_msg
+        let len=decimalToHex(data.length/2)
+        if(len.length==1){
+            len='0'+len
+        }
+        data=len+data
+
+        return 发送AT命令(`AT+BLEADVDATA="${data}"`)
+    }
 
     /**
- * @param txt 传感器测量值 
- */
+    * @param cmd 命令
+    * @param time_out 超时时间 eg:50
+    */
+    //% block="发送AT命令|命令 %cmd 超时时间ms %time_out"
+    export function 发送AT命令(cmd:string,time_out:number=50):number {
+        serial.writeLine(cmd+"\r\n")
+        for(let i=0;i<time_out;i++){
+            basic.pause(1)
+            if(_msg_data.includes('OK')){
+                _need_clear = true
+                return 0
+            }
+            if (_msg_data.includes('ERROR')){
+                _need_clear = true
+                return 1
+            }
+        }
+        return 2
+    }
+    //% block="初始化蓝牙设置"
+    export function 初始化蓝牙设置():number {
+        serial.redirect(
+            SerialPin.P15,
+            SerialPin.P16,
+            BaudRate.BaudRate115200
+        )
+        loops.everyInterval(1, function () {
+            let msg = serial.readLine()
+            if (msg.includes('busy')) {
+                msg = ''
+            }
+            if (msg.includes('AT')) {
+                msg = ''
+            }
+            if (_need_clear) {
+                _msg_data = msg
+                _need_clear = false
+            }
+            else {
+                _msg_data = _msg_data + msg
+            }
+        })
+        if(发送AT命令('AT+BLEINIT=2')!=0){
+            return 1
+        }
+        if (发送AT命令('AT+BLEADVPARAM=32,64,3,0,4,0,1,"00:00:00:00:00:00"') != 0) {
+            return 2
+        }
+        if (发送AT命令('AT+BLEADVSTART') != 0) {
+            return 3
+        }
+        return 0
+    }
+    /**
+     * @param txt 传感器测量值 
+     */
     //% block="CRC32算法|字符串 %txt"
     export function CRC32(txt: string): string {
         function crc32(str: string) {
-            function decimalToHex(num: number): string {
-
-                const hexChars = '0123456789ABCDEF';
-                let hexString = '';
-
-                while (num > 0) {
-                    const remainder = num % 16;
-                    hexString = hexChars[remainder] + hexString;
-                    num = Math.floor(num / 16);
-                }
-
-                return hexString || '0';
-            }
             let crcTable = (function () {
                 let c = 0
                 let table = [];
